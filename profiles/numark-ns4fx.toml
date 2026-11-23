@@ -1,0 +1,336 @@
+# Numark NS4FX: what each control sends.
+#
+# Written only from a capture taken on a real NS4FX (raw messages in
+# crates/dj-midi/tests/captures/ns4fx-capture.midilog). Step numbers in the
+# comments refer to that capture.
+#
+# How the controller uses MIDI channels (all from the capture):
+# - channels 1-4: the deck controls of decks 1-4. The NS4FX switches the
+#   channel itself when LAYER is pressed (left side: 1 <-> 3, right: 2 <-> 4),
+#   and SHIFT stays on channel 1 (left) or 2 (right).
+# - channels 1-4 are also the four mixer channel strips (fixed, no layers).
+# - channels 5-8: the pad section (pads, pad modes, loop buttons) of decks 1-4.
+# - channels 9-10: the two FX units.
+# - channel 16: browser, load, crossfader, cue gain and cue mix.
+# The MAIN and BOOTH volume knobs and the microphone section send nothing
+# (steps 46-48): they work in the hardware only.
+#
+# See crates/dj-midi/src/profile.rs for the format.
+
+name = "Numark NS4FX"
+port = "NS4FX"
+lights = "ns4fx"
+
+[jog]
+# One turn of the jog top sent 1086 and 969 ticks in the capture (steps 80
+# and 121, turned by hand). 1000 until a calibration says otherwise.
+ticks_per_turn = 1000
+
+# ----- browser (channel 16) ---------------------------------------------------
+
+[[control]]
+name = "browse"            # step 1: 1 = one click right, 127 = one click left
+cc = 0x00
+kind = "relative"
+channel = "16"
+
+[[control]]
+name = "browse_shift"      # step 3: SHIFT + turn sends its own controller
+cc = 0x01
+kind = "relative"
+channel = "16"
+
+[[control]]
+name = "browse_push"       # step 2
+note = 0x07
+channel = "16"
+
+[[control]]
+name = "browse_shift_push" # step 4
+note = 0x06
+channel = "16"
+
+[[control]]
+name = "load"              # index = deck: the left LOAD sends 0x02 with deck 1
+notes = [0x02, 0x05]       # active and 0x04 with deck 3; the right one 0x03 / 0x05
+channel = "16"             # (steps 5-6; follow-up capture steps 1-4). SHIFT +
+                           # LOAD sends the same note (step 9, follow-up step 2).
+
+[[control]]
+name = "crossfader"        # step 42: 0 = fully left, 127 = fully right
+cc = 0x08
+channel = "16"
+
+[[control]]
+name = "cue_gain"          # step 43 (SHIFT + CUE GAIN sends the same, step 44)
+cc = 0x0C
+channel = "16"
+
+[[control]]
+name = "cue_mix"           # step 45
+cc = 0x0D
+channel = "16"
+
+# ----- mixer channel strips (channels 1-4) -------------------------------------
+
+[[control]]
+name = "level"             # steps 10, 18, 26, 34
+cc = 0x16
+channel = "strip"
+
+[[control]]
+name = "eq_high"           # TREBLE, steps 11, 19, 27, 35
+cc = 0x17
+channel = "strip"
+
+[[control]]
+name = "eq_mid"            # steps 12, 20, 28, 36
+cc = 0x18
+channel = "strip"
+
+[[control]]
+name = "eq_low"            # BASS, steps 13, 21, 29, 37
+cc = 0x19
+channel = "strip"
+
+[[control]]
+name = "filter"            # steps 14, 22, 30, 38
+cc = 0x1A
+channel = "strip"
+
+[[control]]
+name = "headphone_cue"     # steps 15, 23, 31, 39 (a note-on per press: toggle)
+note = 0x1B
+channel = "strip"
+
+[[control]]
+name = "channel_fader"     # steps 16, 24, 32, 40: 0 = down, 127 = up
+cc = 0x1C
+channel = "strip"
+
+[[control]]
+name = "xfader_assign"     # steps 17, 25, 33, 41: 1 = left, 0 = middle, 2 = right
+cc = 0x1E
+kind = "switch"
+channel = "strip"
+
+# ----- FX (channel 9 = unit 1, channel 10 = unit 2) ----------------------------
+
+[[control]]
+name = "fx_wet_dry"        # step 49 (one knob, sent on both channels)
+cc = 0x04
+channel = "fx"
+
+[[control]]
+name = "fx_beats"          # steps 50-51 (both channels; SHIFT sends the same)
+cc = 0x05
+kind = "relative"
+channel = "fx"
+
+[[control]]
+name = "fx_tap"            # steps 52-53 (both channels)
+note = 0x09
+channel = "fx"
+
+[[control]]
+name = "fx_select"         # steps 54-59: buttons 1-3 on channel 9 (0x00-0x02),
+notes = [0x00, 0x05]       # buttons 4-6 on channel 10 (0x03-0x05); index = note
+channel = "fx"
+
+[[control]]
+name = "fx_switch"         # steps 60-61: ON/OFF/HOLD switch, values 0, 1, 2
+cc = 0x03
+kind = "switch"
+channel = "fx"
+
+# ----- decks (channels 1-4), SHIFT per side ------------------------------------
+
+[[control]]
+name = "shift"             # steps 62, 103 (also with decks 3/4 active, 149, 162)
+note = 0x20
+channel = "side"
+
+[[control]]
+name = "layer"             # steps 63, 104, 144: note-on on the channel of the
+note = 0x08                # deck that is now active, note-off on the old one
+channel = "deck"
+
+[[control]]
+name = "play"              # step 64
+note = 0x00
+channel = "deck"
+
+[[control]]
+name = "cue"               # step 66
+note = 0x01
+channel = "deck"
+
+[[control]]
+name = "sync"              # step 68
+note = 0x02
+channel = "deck"
+
+[[control]]
+name = "sync_shift"        # step 69
+note = 0x03
+channel = "deck"
+
+[[control]]
+name = "play_shift"        # step 65
+note = 0x04
+channel = "deck"
+
+[[control]]
+name = "cue_shift"         # step 67
+note = 0x05
+channel = "deck"
+
+[[control]]
+name = "pitch"             # 14-bit; 0 = top (slower), 127 = bottom: pitch probe, capture 4
+cc14 = [0x09, 0x29]        # SHIFT + pitch fader sends the same (step 71)
+channel = "deck"
+# no pickup: the fader is absolute, the pitch jumps to it
+
+[[control]]
+name = "bend_down"         # step 72
+note = 0x0C
+channel = "deck"
+
+[[control]]
+name = "bend_up"           # step 74
+note = 0x0B
+channel = "deck"
+
+[[control]]
+name = "bend_down_shift"   # step 73
+note = 0x2C
+channel = "deck"
+
+[[control]]
+name = "bend_up_shift"     # step 75
+note = 0x2B
+channel = "deck"
+
+[[control]]
+name = "scratch"           # step 77: note-on per press, no note-off
+note = 0x07
+channel = "deck"
+
+[[control]]
+name = "jog_touch"         # step 78: touching the top
+note = 0x06
+channel = "deck"
+
+[[control]]
+name = "jog"               # steps 79-82: 1, 2, 3... clockwise; 127, 126...
+cc = 0x06                  # anticlockwise. The outer ring sends the same
+kind = "relative"          # controller without a touch (step 81).
+channel = "deck"
+
+# ----- pad section (channels 5-8 = decks 1-4) -------------------------------------
+
+[[control]]
+name = "pad"               # steps 90, 93, 96, 99: the same notes in every mode
+notes = [0x14, 0x1B]
+channel = "deck+4"
+
+[[control]]
+name = "pad_shift"         # step 101
+notes = [0x1C, 0x23]
+channel = "deck+4"
+
+[[control]]
+name = "mode_cues"         # step 89
+note = 0x00
+channel = "deck+4"
+
+[[control]]
+name = "mode_cues_shift"   # step 91
+note = 0x02
+channel = "deck+4"
+
+[[control]]
+name = "mode_auto_loop"    # step 92
+note = 0x0D
+channel = "deck+4"
+
+[[control]]
+name = "mode_auto_loop_shift" # step 94
+note = 0x06
+channel = "deck+4"
+
+[[control]]
+name = "mode_fader_cuts"   # step 95 (the controller then moves the crossfader
+note = 0x07                # itself when the pads are pressed: step 96)
+channel = "deck+4"
+
+[[control]]
+name = "mode_fader_cuts_shift" # step 97
+note = 0x0E
+channel = "deck+4"
+
+[[control]]
+name = "mode_sample"       # step 98
+note = 0x0B
+channel = "deck+4"
+
+[[control]]
+name = "mode_sample_shift" # step 100
+note = 0x0F
+channel = "deck+4"
+
+[[control]]
+name = "loop_toggle"       # LOOP ON/OFF, step 83
+note = 0x40
+channel = "deck+4"
+
+[[control]]
+name = "loop_toggle_shift" # step 84
+note = 0x41
+channel = "deck+4"
+
+[[control]]
+name = "loop_halve"        # LOOP 1/2, step 85
+note = 0x34
+channel = "deck+4"
+
+[[control]]
+name = "loop_double"       # LOOP x2, step 87
+note = 0x35
+channel = "deck+4"
+
+# SHIFT + LOOP 1/2 (loop in) and SHIFT + LOOP x2 (loop out) send 0x36 / 0x37
+# on the left deck and the other way round on the right deck: steps 86, 88,
+# 127, 129, confirmed by the follow-up capture (steps 7-8). Decks 3 and 4
+# are taken to be like their side (same buttons, the controller only
+# changes the channel).
+[[control]]
+name = "loop_in"
+note = 0x36
+channel = "left+4"
+
+[[control]]
+name = "loop_in"
+note = 0x37
+channel = "right+4"
+
+[[control]]
+name = "loop_out"
+note = 0x37
+channel = "left+4"
+
+[[control]]
+name = "loop_out"
+note = 0x36
+channel = "right+4"
+
+# FADER CUTS: the controller itself sends a crossfader-like value while a
+# pad is held: on the left deck as the crossfader (channel 16, 0x08), on the
+# right deck as controller 0x08 on the deck channel (step 137; follow-up
+# step 10). Both rest at 127 (the deck cut) and dip to open it; for the
+# right deck (crossfader side B) the cut is the crossfader fully left, so
+# the controller mirrors this value.
+[[control]]
+name = "fader_cut"
+cc = 0x08
+channel = "deck"

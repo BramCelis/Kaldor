@@ -1,0 +1,19 @@
+[package]
+name = "dj-midi"
+description = "MIDI for Kaldor: message decoding, capture files, device I/O, the mapping engine and the NS4FX profile."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+midir.workspace = true
+serde.workspace = true
+toml.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

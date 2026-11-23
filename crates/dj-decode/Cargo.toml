@@ -1,0 +1,20 @@
+[package]
+name = "dj-decode"
+description = "Audio file decoding and resampling for Kaldor, into progressively filled in-memory tracks."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+dj-dsp.workspace = true
+symphonia.workspace = true
+rubato.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+hound.workspace = true
+
+[lints]
+workspace = true

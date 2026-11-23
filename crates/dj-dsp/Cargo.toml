@@ -1,0 +1,19 @@
+[package]
+name = "dj-dsp"
+description = "DSP building blocks for Kaldor: smoothing, filters, EQ, interpolation, time-stretch, effects, limiter."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[build-dependencies]
+# Compiles the vendored Signalsmith Stretch C++ (key lock).
+cc = "1"
+
+[dependencies]
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

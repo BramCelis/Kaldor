@@ -1,0 +1,17 @@
+[package]
+name = "dj-core"
+description = "Shared types, configuration and time math for Kaldor. No I/O."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+serde.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+toml.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Kaldor's Windows installer (WiX Toolset v3). Built by installer/build-msi.ps1;
+  see that file for how.
+
+  A normal installer window: welcome, the licence agreement (license.rtf),
+  the install folder (default C:\Program Files\Kaldor, any folder can be
+  chosen), install, finish with "Start Kaldor". Installed for all users
+  of the PC (Windows asks for permission once). Start menu and desktop
+  shortcut; uninstall from Settings > Apps. Settings, the library and
+  recordings live in each user's own folders and stay after an uninstall.
+
+  UpgradeCode never changes: a newer build replaces the installed one.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <Product Id="*"
+           Name="Kaldor"
+           Language="1033"
+           Version="$(var.Version)"
+           Manufacturer="Kaldor"
+           UpgradeCode="F9FA5249-C1BB-4374-92A2-0BF9CEE12AD6">
+    <Package InstallerVersion="500"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="x64"
+             Description="Kaldor $(var.Version) (beta): 4-deck DJ software"
+             Comments="Beta build for testing." />
+
+    <MajorUpgrade AllowSameVersionUpgrades="yes"
+                  DowngradeErrorMessage="A newer version of Kaldor is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="KaldorIcon" SourceFile="$(var.IconPath)" />
+    <Property Id="ARPPRODUCTICON" Value="KaldorIcon" />
+    <!-- ARPNOMODIFY is set by WixUI_InstallDir itself. -->
+    <Property Id="ARPNOREPAIR" Value="1" />
+    <Property Id="ARPCOMMENTS" Value="Beta build of Kaldor, 4-deck DJ software." />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLDIR" Name="Kaldor" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder" />
+      <Directory Id="DesktopFolder" />
+    </Directory>
+
+    <DirectoryRef Id="INSTALLDIR">
+      <Component Id="KaldorExe" Guid="7A77E471-A611-44B4-891F-F3CEF91CFF25" Win64="yes">
+        <File Id="KaldorExeFile" Name="kaldor.exe" Source="$(var.ExePath)" KeyPath="yes" />
+      </Component>
+      <!-- One component per shortcut, installed when its box on the
+           Shortcuts page is ticked (both are by default, also for a silent
+           install). Shortcuts key on a per-user value (ICE43, ICE57). -->
+      <Component Id="StartMenuShortcut" Guid="88E5D85B-95B0-4CC4-A7E2-5F3385C86B87" Win64="yes">
+        <Condition>STARTMENUSHORTCUT</Condition>
+        <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="Kaldor"
+                  Description="4-deck DJ software" Target="[INSTALLDIR]kaldor.exe"
+                  WorkingDirectory="INSTALLDIR" Icon="KaldorIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Kaldor\Installer" Name="startmenu"
+                       Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+      <Component Id="DesktopShortcut" Guid="18031BA0-2C80-4B3B-BA97-DB79E948DC1F" Win64="yes">
+        <Condition>DESKTOPSHORTCUT</Condition>
+        <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="Kaldor"
+                  Description="4-deck DJ software" Target="[INSTALLDIR]kaldor.exe"
+                  WorkingDirectory="INSTALLDIR" Icon="KaldorIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Kaldor\Installer" Name="desktop"
+                       Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- The boxes of the Shortcuts page (an unticked box clears its
+         property). Secure: passed on to the installation itself. -->
+    <Property Id="STARTMENUSHORTCUT" Value="1" Secure="yes" />
+    <Property Id="DESKTOPSHORTCUT" Value="1" Secure="yes" />
+
+    <Feature Id="Main" Title="Kaldor" Level="1">
+      <ComponentRef Id="KaldorExe" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+    <!-- Kaldor's own folder inside a chosen folder that is not empty
+         (tools/installer-actions, a DLL inside the MSI). -->
+    <Binary Id="KaldorActions" SourceFile="$(var.ActionsPath)" />
+    <CustomAction Id="KaldorFolder" BinaryKey="KaldorActions" DllEntry="KaldorFolder" Execute="immediate" Return="ignore" />
+
+    <!-- The installer window: WiX's standard "install folder" dialogs,
+         with the agreement and Kaldor's pictures. -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.LicensePath)" />
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.BannerPath)" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.DialogPath)" />
+
+    <!-- "Start Kaldor" on the last page (ticked). -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Start Kaldor" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WixShellExecTarget" Value="[#KaldorExeFile]" />
+    <CustomAction Id="StartKaldor" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
+    <!-- The pages: WiX's install-folder set (WixUI_InstallDir, wired the
+         same way, as read from its tables), plus the Kaldor folder check
+         after Browse and on Next, and the Shortcuts page after the folder
+         page. -->
+    <UI Id="KaldorUI">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="InstallDir" />
+      <Property Id="ARPNOMODIFY" Value="1" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+
+      <!-- Browse… OK: the dialog sets the path (1) and closes (2); then
+           Kaldor's folder, then the usual check. -->
+      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="KaldorFolder" Order="3">1</Publish>
+      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="4">1</Publish>
+      <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="5"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="StartKaldor">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT Installed</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">Installed AND PATCH</Publish>
+
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">LicenseAccepted = "1"</Publish>
+
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="KaldorFolder" Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="3">NOT WIXUI_DONTVALIDATEPATH</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ShortcutsDlg" Order="5">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="ShortcutsDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+      <Publish Dialog="ShortcutsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ShortcutsDlg" Order="1">NOT Installed</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed AND NOT PATCH</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">Installed AND PATCH</Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+      <!-- The Shortcuts page, in the style of the other pages. -->
+      <Dialog Id="ShortcutsDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="Choose where you want shortcuts to Kaldor." />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}Shortcuts" />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="DesktopBox" Type="CheckBox" X="20" Y="62" Width="330" Height="17" Property="DESKTOPSHORTCUT" CheckBoxValue="1" Text="Create a shortcut on the &amp;desktop" />
+        <Control Id="StartMenuBox" Type="CheckBox" X="20" Y="84" Width="330" Height="17" Property="STARTMENUSHORTCUT" CheckBoxValue="1" Text="Create a shortcut in the &amp;Start menu" />
+      </Dialog>
+    </UI>
+    <UIRef Id="WixUI_Common" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+  </Product>
+</Wix>

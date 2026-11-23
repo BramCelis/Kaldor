@@ -1,0 +1,19 @@
+[package]
+name = "installer-actions"
+description = "Custom actions of Kaldor's Windows installer (a DLL inside the MSI): puts Kaldor in its own folder inside a chosen folder that is not empty."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+# cdylib: the DLL the MSI calls; rlib: for the tests.
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(windows)'.dependencies]
+# MsiGetPropertyW / MsiSetTargetPathW (msi.dll). Same version as the rest
+# of the tree.
+windows = { version = "0.62", features = ["Win32_Foundation", "Win32_System_ApplicationInstallationAndServicing"] }
+
+[lints]
+workspace = true

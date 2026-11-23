@@ -1,0 +1,15 @@
+[package]
+name = "export-verify"
+description = "Reads a rekordbox USB stick with parsers that share no code with the writer and checks it against the export's XML."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+rekordcrate.workspace = true
+binrw = "0.14"
+quick-xml.workspace = true
+
+[lints]
+workspace = true

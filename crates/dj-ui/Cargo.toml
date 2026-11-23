@@ -1,0 +1,43 @@
+[package]
+name = "dj-ui"
+description = "egui user interface for Kaldor: decks, waveforms, mixer, library, setup."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+serde.workspace = true
+toml.workspace = true
+hound.workspace = true
+dj-core.workspace = true
+dj-audio.workspace = true
+dj-midi.workspace = true
+dj-decode.workspace = true
+dj-analysis.workspace = true
+dj-dsp.workspace = true
+dj-library.workspace = true
+dj-export.workspace = true
+egui.workspace = true
+eframe = { workspace = true, features = ["wgpu", "default_fonts", "accesskit", "x11", "wayland", "clipboard"] }
+tracing.workspace = true
+# Decodes the Kaldor logo (window icon, top bar). Already in the tree
+# through eframe.
+png = "0.18"
+# FLAC master recordings (pure Rust, Apache-2.0), without its default
+# features (log, threads, serde).
+flacenc = { version = "0.5", default-features = false }
+resvg = { version = "0.50.0", default-features = false }
+# Native open / save / folder dialogs for the Browse buttons (MIT). On
+# Linux it uses the desktop's file chooser portal (no GTK needed).
+rfd.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+# GetCursorPos for files dropped from Explorer (see src/os_cursor.rs);
+# GetLocalTime for recording names (src/recorder.rs);
+# SetThreadExecutionState to keep the screen awake (src/keep_awake.rs). Same
+# version cpal and eframe already use.
+windows = { version = "0.62", features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging", "Win32_System_SystemInformation", "Win32_System_Power"] }
+
+[lints]
+workspace = true

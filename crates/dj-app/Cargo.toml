@@ -1,0 +1,43 @@
+[package]
+name = "dj-app"
+description = "The Kaldor binary: wires engine, UI, library and config together."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "kaldor"
+path = "src/main.rs"
+
+[features]
+# Windows only: build with the Steinberg ASIO host (use with --host ASIO).
+asio = ["dj-audio/asio"]
+
+[dependencies]
+dj-core.workspace = true
+dj-audio.workspace = true
+dj-ui.workspace = true
+dj-midi.workspace = true
+dj-analysis.workspace = true
+dj-library.workspace = true
+dj-export.workspace = true
+dj-decode.workspace = true
+egui.workspace = true
+anyhow.workspace = true
+toml.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+assert_no_alloc.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+# AttachConsole: the windowed release build prints its command-line output
+# in the terminal it was started from. Same version as the rest of the tree.
+windows = { version = "0.62", features = ["Win32_System_Console"] }
+
+[lints]
+workspace = true
+
+[build-dependencies]
+# Puts the Kaldor icon into the Windows .exe (does nothing on other targets).
+embed-resource = "3.0"

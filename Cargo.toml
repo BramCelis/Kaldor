@@ -1,0 +1,71 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "tools/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "PolyForm-Noncommercial-1.0.0"
+repository = ""
+rust-version = "1.95"
+
+[workspace.dependencies]
+dj-core = { path = "crates/dj-core" }
+dj-dsp = { path = "crates/dj-dsp" }
+dj-decode = { path = "crates/dj-decode" }
+dj-audio = { path = "crates/dj-audio" }
+dj-analysis = { path = "crates/dj-analysis" }
+dj-library = { path = "crates/dj-library" }
+export-verify = { path = "tools/export-verify" }
+dj-export = { path = "crates/dj-export" }
+dj-ui = { path = "crates/dj-ui" }
+dj-midi = { path = "crates/dj-midi" }
+
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+toml = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+cpal = "0.18"
+symphonia = { version = "0.6", features = ["all"] }
+rubato = "5"
+realfft = "3"
+ebur128 = "0.1"
+rtrb = "0.4"
+egui = "0.37"
+eframe = { version = "0.37", default-features = false }
+rusqlite = { version = "0.42", features = ["bundled"] }
+lofty = "0.25"
+assert_no_alloc = "1.1"
+quick-xml = "0.42"
+baken-export = "=4.13.0"
+baken-core = "=4.13.0"
+rekordcrate = { version = "=0.3.0", default-features = false }
+crossbeam-channel = "0.5"
+hound = "3.5"
+midir = "0.11"
+percent-encoding = "2.3"
+proptest = "1"
+rfd = "0.18"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+dbg_macro = "warn"
+
+# Debug and test builds: line numbers for our own crates (panics and
+# backtraces still point at the line), no debug info for dependencies. Full
+# debug info made every test program a large link on Windows (most of a
+# full test run was linking). Add `debug = true` here to step through code
+# in a debugger.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 2
+debug = false
+
+[profile.release]
+debug = 1

@@ -1,0 +1,2 @@
+// Windows resources of the kaldor binary (see build.rs).
+1 ICON "kaldor.ico"

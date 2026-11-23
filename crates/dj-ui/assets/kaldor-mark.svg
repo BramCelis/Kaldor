@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Dual orbit, crystal: the record an eight-sided cut stone, each facet shaded by where it faces (light from the top left); the decks small cut diamonds. -->
+  <defs><clipPath id="lit"><path d="M0 0 H104 L0 104 Z"/></clipPath></defs>
+  <circle cx="50" cy="50" r="42" fill="none" stroke="#C9CED6" stroke-width="2.5"/>
+  <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" clip-path="url(#lit)"/>
+  <g stroke-linejoin="round">
+    <path d="M50 50 L79.57 62.26 L62.26 79.57 Z" fill="#3D1494"/>
+    <path d="M50 50 L62.26 79.57 L37.74 79.57 Z" fill="#5222C8"/>
+    <path d="M50 50 L37.74 79.57 L20.43 62.26 Z" fill="#6B2FF0"/>
+    <path d="M50 50 L20.43 62.26 L20.43 37.74 Z" fill="#8A58FF"/>
+    <path d="M50 50 L20.43 37.74 L37.74 20.43 Z" fill="#A27BFF"/>
+    <path d="M50 50 L37.74 20.43 L62.26 20.43 Z" fill="#8A58FF"/>
+    <path d="M50 50 L62.26 20.43 L79.57 37.74 Z" fill="#6B2FF0"/>
+    <path d="M50 50 L79.57 37.74 L79.57 62.26 Z" fill="#5222C8"/>
+  </g>
+  <circle cx="50" cy="50" r="6" fill="#121418"/>
+  <!-- Decks: diamonds, lit half and shaded half. -->
+  <path d="M79.7 10.3 L89.7 20.3 L79.7 30.3 L69.7 20.3 Z" fill="#C9CED6"/>
+  <path d="M79.7 10.3 L69.7 20.3 L79.7 30.3 Z" fill="#FFFFFF"/>
+  <path d="M20.3 69.7 L30.3 79.7 L20.3 89.7 L10.3 79.7 Z" fill="#9874EE"/>
+  <path d="M20.3 69.7 L10.3 79.7 L20.3 89.7 Z" fill="#C4ABFF"/>
+</svg>

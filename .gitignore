@@ -1,0 +1,15 @@
+# Rust build output
+/target/
+**/*.rs.bk
+
+# Local-only files
+/local/
+/Test music/
+*.log
+.env
+.env.*
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+desktop.ini

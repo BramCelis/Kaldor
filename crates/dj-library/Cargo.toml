@@ -1,0 +1,35 @@
+[package]
+name = "dj-library"
+description = "SQLite music library for Kaldor: tracks, analysis cache, crates, smart crates, history, search, folder import, Import from… (rekordbox XML, iTunes / Music XML, M3U / PLS)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+dj-core.workspace = true
+dj-decode.workspace = true
+dj-analysis.workspace = true
+# `serialize`: the decrypted rekordbox library is opened from memory.
+rusqlite = { workspace = true, features = ["serialize"] }
+lofty.workspace = true
+# rekordbox sync (src/interop/rekordbox_db.rs): SQLCipher 4 page
+# decryption (AES-256-CBC, HMAC / PBKDF2 over SHA-512) and the key's zlib
+# layer. RustCrypto and miniz_oxide, MIT OR Apache-2.0; the same versions
+# baken-export already brings into the tree.
+aes = "0.9"
+cbc = "0.2"
+hmac = "0.13"
+pbkdf2 = "0.13"
+sha2 = "0.11"
+miniz_oxide = "0.9"
+crossbeam-channel.workspace = true
+thiserror.workspace = true
+quick-xml.workspace = true
+percent-encoding.workspace = true
+
+[dev-dependencies]
+hound.workspace = true
+
+[lints]
+workspace = true

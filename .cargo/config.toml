@@ -1,0 +1,16 @@
+# Only used when building with `--features asio` (Windows).
+#
+# asio-sys downloads the Steinberg ASIO SDK with a PowerShell script when
+# CPAL_ASIO_DIR is not set. Point it at a local copy instead, so a build never
+# downloads or runs anything: unpack the SDK so that
+# local/asiosdk/common/asio.h exists. `local/` is git-ignored.
+# An environment variable CPAL_ASIO_DIR set in your shell takes precedence.
+[env]
+CPAL_ASIO_DIR = { value = "local/asiosdk", relative = true }
+
+# Link with the LLVM linker that ships with Rust (rustup's toolchain,
+# `rust-lld.exe`; nothing extra to install). It links much faster than
+# Microsoft's link.exe, which made up most of a full test run. Windows (MSVC)
+# only; macOS and Linux keep their default linker.
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"

@@ -1,0 +1,17 @@
+[package]
+name = "dj-analysis"
+description = "Track analysis for Kaldor: waveforms, BPM and beatgrid, key, loudness."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+dj-core.workspace = true
+dj-dsp.workspace = true
+dj-decode.workspace = true
+realfft.workspace = true
+ebur128.workspace = true
+
+[lints]
+workspace = true

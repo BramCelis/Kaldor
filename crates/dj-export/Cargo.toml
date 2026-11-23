@@ -1,0 +1,32 @@
+[package]
+name = "dj-export"
+description = "Export from the Kaldor library to rekordbox: rekordbox XML, and a USB stick with the Device Library and OneLibrary."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+dj-core.workspace = true
+dj-library.workspace = true
+quick-xml.workspace = true
+baken-export.workspace = true
+baken-core.workspace = true
+percent-encoding.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+export-verify.workspace = true
+hound.workspace = true
+
+[lints]
+workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+    "Win32_System_Ioctl",
+] }

@@ -1,0 +1,38 @@
+[package]
+name = "dj-audio"
+description = "Real-time audio engine for djapp: decks, mixer, routing, device output. No UI dependencies."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[features]
+# Windows only: Steinberg ASIO host through cpal. Off by default; needs LLVM
+# and the ASIO SDK at build time (see the README). An ASIO build links
+# the ASIO SDK (GPLv3 or Steinberg proprietary licence).
+asio = ["cpal/asio", "dep:asio-sys"]
+
+[dependencies]
+dj-core.workspace = true
+dj-dsp.workspace = true
+dj-decode.workspace = true
+cpal.workspace = true
+rtrb.workspace = true
+assert_no_alloc.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+# Same version cpal uses; only to list every registered ASIO driver with its
+# load error (`--list-devices --host ASIO`).
+asio-sys = { version = "0.4", optional = true }
+# WASAPI exclusive mode (`--host WASAPI-Exclusive`); cpal has shared mode only.
+wasapi = "0.27"
+# Same version cpal and wasapi use. MMCSS thread priority and WASAPI error codes.
+windows = { version = "0.62", features = ["Win32_Foundation", "Win32_System_Threading", "Win32_Media_Audio"] }
+
+[dev-dependencies]
+dj-analysis.workspace = true
+
+[lints]
+workspace = true
